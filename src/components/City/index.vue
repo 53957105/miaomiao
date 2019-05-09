@@ -72,7 +72,6 @@ export default {
 		toIndex(index){
 			var h2=this.$refs.city_sort.getElementsByTagName('h2');
 			this.$refs.city_sort.parentNode.scrollTop=h2[index].offsetTop;
-			console.log(index);
 		}
 	}
 }

@@ -29,10 +29,8 @@ export default {
 	},
 	mounted(){
 		this.axios.get('/api/movieComingList?cityId=10').then((res)=>{
-      console.log(res);
 			if(res.status===200){
 				this.list=res.data.data.comingList;
-				console.log(this.list);
 			}
 		});
 	},

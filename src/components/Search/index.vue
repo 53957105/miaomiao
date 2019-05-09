@@ -3,30 +3,22 @@
 				<div class="search_input">
 					<div class="search_input_wrapper">
 						<i class="iconfont icon-sousuo"></i>
-						<input type="text">
+						<input type="text" v-model="key">
 					</div>					
 				</div>
 				<div class="search_result">
 					<h3>电影/电视剧/综艺</h3>
 					<ul>
-						<li>
-							<div class="img"><img src="/images/movie_1.jpg"></div>
+						<li v-for="item in moviesList" :key="item.id">
+							<div class="img"><img :src="item.img | setWH('128.180')"></div>
 							<div class="info">
-								<p><span>无名之辈</span><span>8.5</span></p>
-								<p>A Cool Fish</p>
-								<p>剧情,喜剧,犯罪</p>
-								<p>2018-11-16</p>
+								<p><span>{{item.nm}}</span><span>{{item.sc}}</span></p>
+								<p>{{item.enm}}</p>
+								<p>{{item.cat}}</p>
+								<p>{{item.rt}}</p>
 							</div>
 						</li>
-						<li>
-							<div class="img"><img src="/images/movie_1.jpg"></div>
-							<div class="info">
-								<p><span>无名之辈</span><span>8.5</span></p>
-								<p>A Cool Fish</p>
-								<p>剧情,喜剧,犯罪</p>
-								<p>2018-11-16</p>
-							</div>
-						</li>
+					
 					</ul>
 				</div>
 			</div>
@@ -34,7 +26,41 @@
 
 <script>
 export default {
-    name:'Search'
+    name:'Search',
+	data(){
+		return{
+			key:'',
+			moviesList:[]
+		}
+	},
+	methods:{
+		cancelRequest(){
+			if(typeof this.source==='function'){
+				this.source('终止请求');
+			}
+		}
+	},
+	watch:{
+		key(newVal){
+			if (!this.key) return;
+			this.axios.get('/api/searchList?cityId=10&kw='+this.key,{
+				cancelToken:new this.axios.CancelToken((c)=>{
+					console.log('ddd');
+					this.source=c;
+				})
+			}).then((res)=>{
+				if(res.status===200){
+					this.moviesList=res.data.data.movies.list;
+				}
+			}).catch((err)=>{
+				if(this.axios.isCancel(err)){
+					console.log('请求被取消',err.message);
+				}else{
+					console.log(err);
+				}
+			});
+		}
+	}
 }
 </script>
 

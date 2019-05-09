@@ -29,7 +29,6 @@ export default {
 		this.axios.get('/api/movieOnInfoList?cityId=10').then((res)=>{
 			if(res.status===200){
 				this.list=res.data.data.movieList;
-				console.log(this.list);
 			}
 		});
 	},
