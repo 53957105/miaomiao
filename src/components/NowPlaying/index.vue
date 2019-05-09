@@ -1,37 +1,79 @@
 <template>
     <div class="movie_body">
-				<ul>
-					<li v-for="item in list" :key="item.id">
-						<div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
-						<div class="info_list">
-							<h2>{{item.nm}} <img v-if="item.version" src="http://img3.imgtn.bdimg.com/it/u=2528229143,627081474&fm=214&gp=0.jpg" />	</h2>
-							<p>观众评 <span class="grade">{{item.sc}}</span></p>
-							<p>主演: {{item.star}}</p>
-							<p>{{item.showInfo}}</p>
-						</div>
-						<div class="btn_mall">
-							购票
-						</div>
-					</li>
-				</ul>
-			</div>
+		<Loading v-if="loading"/>
+			<Scroller v-else :toScroll="toScroll" :toTouchEnd="toTouchEnd">
+				<div>
+					<div>{{msg}}</div>
+					<ul>
+						<li v-for="item in list" :key="item.id" @tap="toDetail(item.id)">
+							<div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
+							<div class="info_list">
+								<h2>{{item.nm}} <img v-if="item.version" src="http://img3.imgtn.bdimg.com/it/u=2528229143,627081474&fm=214&gp=0.jpg" />	</h2>
+								<p>观众评 <span class="grade">{{item.sc}}</span></p>
+								<p>主演: {{item.star}}</p>
+								<p>{{item.showInfo}}</p>
+							</div>
+							<div class="btn_mall" @tap="buy(item.id)">
+								购票
+							</div>
+						</li>
+					</ul>
+				</div>
+			</Scroller>
+		</div>
 </template>
 
 <script>
+// import BScroll from 'better-scroll';
 export default {
 	name:'NowPlaying',
 	data(){
 		return {
-			list:[]
+			msg:'',
+			loading:true,
+			list:[],
+			prevCityId :-1
 		}
 	},
-	mounted(){
-		this.axios.get('/api/movieOnInfoList?cityId=10').then((res)=>{
-			if(res.status===200){
-				this.list=res.data.data.movieList;
-			}
-		});
+	activated(){
+		var cityId=this.$store.state.City.id;
+		if( this.prevCityId === cityId ){return;}
+		this.loading=true;
+		this.loadData(cityId);
 	},
+	methods:{
+		loadData(cid){
+			this.axios.get('/api/movieOnInfoList?cityId='+cid).then((res)=>{
+				if(res.status===200){
+					this.prevCityId = cid;
+					// res.data.data.movieList.forEach(element => {
+					// 	this.list.push(element);
+					// });
+					this.list=res.data.data.movieList;
+					this.loading=false;
+					
+				}
+			});
+		},
+		toDetail(id){
+			console.log('toDetail',id);
+			this.$router.push('/movie/detail/'+id);
+		},
+		buy(id){
+			console.log('buy',id);
+		},
+		toScroll(pos){
+			if(this.loading) return;
+			this.loading=true;
+			this.msg='重新加载';
+			this.loadData(11);
+			console.log('toScroll');
+		},
+		toTouchEnd(pos){
+			this.msg='';
+			console.log('toTouchEnd');
+		}
+	}
 }
 </script>
 

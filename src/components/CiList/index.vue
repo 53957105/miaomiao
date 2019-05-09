@@ -1,5 +1,7 @@
 <template>
     <div class="cinema_body">
+			<Loading v-if="loading"/>
+		<Scroller v-else>
 		<ul>
 			<li v-for="item in list" :key="item.id">
 				<div>
@@ -15,6 +17,7 @@
 				</div>
 			</li>
 		</ul>
+		</Scroller>
 	</div>
 </template>
 
@@ -23,16 +26,16 @@ export default {
 	name:'ciList',
 	data(){
 		return {
-			list:[]
+			loading:true,
+			list:[],
+			prevCityId : -1
 		}
 	},
-	mounted(){
-		this.axios.get('/api/cinemaList?cityId=10').then((res)=>{
-			console.log(res);
-			if(res.status===200){
-				this.list=res.data.data.cinemas;
-			}
-		});
+	activated(){
+		var cityId=this.$store.state.City.id;
+		if( this.prevCityId === cityId ){return;}
+		this.loading=true;
+		this.loadData(cityId);
 	},
 	filters:{
 		formatCard(key){
@@ -63,7 +66,18 @@ export default {
 			}
 			return '';
 		}
-	}
+	},
+	methods:{
+    loadData(cid){
+      this.axios.get('/api/cinemaList?cityId='+cid).then((res)=>{
+			if(res.status===200){
+				this.prevCityId = cid;
+				this.list=res.data.data.cinemas;
+				this.loading=false;
+			}
+		});
+    }
+  }
 }
 </script>
 

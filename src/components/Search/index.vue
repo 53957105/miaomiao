@@ -1,27 +1,26 @@
 <template>
     <div class="search_body">
-				<div class="search_input">
-					<div class="search_input_wrapper">
-						<i class="iconfont icon-sousuo"></i>
-						<input type="text" v-model="key">
-					</div>					
-				</div>
-				<div class="search_result">
-					<h3>电影/电视剧/综艺</h3>
-					<ul>
-						<li v-for="item in moviesList" :key="item.id">
-							<div class="img"><img :src="item.img | setWH('128.180')"></div>
-							<div class="info">
-								<p><span>{{item.nm}}</span><span>{{item.sc}}</span></p>
-								<p>{{item.enm}}</p>
-								<p>{{item.cat}}</p>
-								<p>{{item.rt}}</p>
-							</div>
-						</li>
-					
-					</ul>
-				</div>
-			</div>
+		<div class="search_input">
+			<div class="search_input_wrapper">
+				<i class="iconfont icon-sousuo"></i>
+				<input type="text" v-model="key">
+			</div>					
+		</div>
+		<div class="search_result">
+			<h3>电影/电视剧/综艺</h3>
+			<ul>
+				<li v-for="item in moviesList" :key="item.id">
+					<div class="img"><img :src="item.img | setWH('128.180')"></div>
+					<div class="info">
+						<p><span>{{item.nm}}</span><span>{{item.sc}}</span></p>
+						<p>{{item.enm}}</p>
+						<p>{{item.cat}}</p>
+						<p>{{item.rt}}</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -43,7 +42,8 @@ export default {
 	watch:{
 		key(newVal){
 			if (!this.key) return;
-			this.axios.get('/api/searchList?cityId=10&kw='+this.key,{
+			var cityId=this.$store.state.City.id;
+			this.axios.get('/api/searchList?cityId='+cityId+'&kw='+this.key,{
 				cancelToken:new this.axios.CancelToken((c)=>{
 					console.log('ddd');
 					this.source=c;

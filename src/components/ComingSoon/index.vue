@@ -1,21 +1,24 @@
 <template>
   <div class="movie_body">
-    <ul>
-      <li v-for="item in list" :key="item.id">
-        <div class="pic_show">
-          <img :src="item.img | setWH('128.180')">
-        </div>
-        <div class="info_list">
-          <h2>{{item.nm}} <img v-if="item.version" src="http://img3.imgtn.bdimg.com/it/u=2528229143,627081474&fm=214&gp=0.jpg" /> </h2>
-          <p>
-            <span class="person">{{item.wish}}</span> 人想看
-          </p>
-          <p>主演: {{item.star}}</p>
-          <p>{{item.showInfo}}</p>
-        </div>
-        <div class="btn_pre">预售</div>
-      </li>
-    </ul>
+    <Loading v-if="loading"/>
+    <Scroller v-else>
+      <ul>
+        <li v-for="item in list" :key="item.id">
+          <div class="pic_show">
+            <img :src="item.img | setWH('128.180')">
+          </div>
+          <div class="info_list">
+            <h2>{{item.nm}} <img v-if="item.version" src="http://img3.imgtn.bdimg.com/it/u=2528229143,627081474&fm=214&gp=0.jpg" /> </h2>
+            <p>
+              <span class="person">{{item.wish}}</span> 人想看
+            </p>
+            <p>主演: {{item.star}}</p>
+            <p>{{item.showInfo}}</p>
+          </div>
+          <div class="btn_pre">预售</div>
+        </li>
+      </ul>
+    </Scroller>
   </div>
 </template>
 
@@ -24,16 +27,28 @@ export default {
   name: "ComingSoon",
   data(){
 		return {
-			list:[]
+      loading:true,
+      list:[],
+      prevCityId :-1
 		}
 	},
-	mounted(){
-		this.axios.get('/api/movieComingList?cityId=10').then((res)=>{
-			if(res.status===200){
-				this.list=res.data.data.comingList;
-			}
-		});
-	},
+	activated(){
+    var cityId=this.$store.state.City.id;
+		if( this.prevCityId === cityId ){return;}
+		this.loading=true;
+		this.loadData(cityId);
+  },
+  methods:{
+    loadData(cid){
+      this.axios.get('/api/movieComingList?cityId='+cid).then((res)=>{
+        if(res.status===200){
+          this.prevCityId = cid;
+          this.list=res.data.data.comingList;
+          this.loading=false;
+        }
+      });
+    }
+  }
 };
 </script>
 
